@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 	<meta charset="UTF-8">
-	<title></title>
+	<title>Synth</title>
 	<meta name="viewport" content="initial-scale=1.0">
 	<link rel="stylesheet/less" type="text/css" href="style.less" />
 	<script src="http://code.jquery.com/jquery-1.9.1.js"></script>
@@ -10,6 +10,26 @@
 	<script src="synth.js"></script>
 </head>
 <body>
+	<div id="config">
+		<div id="waveform" class="group">
+			<div class="option">
+				<label for="sine">sine</label>
+				<input type="radio" name="waveform" value="sine" checked>
+			</div>
+			<div class="option">
+				<label for="square">square</label>
+				<input type="radio" name="waveform" value="square">
+			</div>
+			<div class="option">
+				<label for="sawtooth">sawtooth</label>
+				<input type="radio" name="waveform" value="sawtooth">
+			</div>
+			<div class="option">		
+				<label for="triangle">triangle</label>
+				<input type="radio" name="waveform" value="triangle">
+			</div>
+		</div>
+	</div>
 	<div id="keyboard">
 	</div>
 </body>

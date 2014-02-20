@@ -1,9 +1,20 @@
 @keyboard-size: 1;
 
+#config{
+	display: inline-block;
+	width: 200px;
+	.group{
+		border: solid 1px grey;
+	}
+}
 #keyboard{
+	display: inline-block;
+
 	button{
 		display	: inline-block;
-		outline: none; 
+		outline: none;
+		border-bottom-left-radius: 5px;
+		border-bottom-right-radius: 5px;
 	}
 	button.note-normal{
 		width	: 50px * @keyboard-size;

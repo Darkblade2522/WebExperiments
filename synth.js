@@ -3,6 +3,12 @@
 //Main class holding notes
 var Synthetizer = function(options){
 	this.notes = {};
+	this.waveforms = {
+		"sine":0,
+		"square":1,
+		"sawtooth":2,
+		"triangle":3
+	}
 	this.context = new webkitAudioContext();
 	this.options = $.extend({
 		waveform: 0,
@@ -34,7 +40,9 @@ Synthetizer.prototype.stopAll = function(){
 	for(var i in this.notes)
 		this.notes[i].stop();
 }
-
+Synthetizer.prototype.setWaveform = function(waveform){
+	this.options.waveform = this.waveforms[waveform];
+}
 var Note = function(name, freq, key, element, synth){
 	this.oscillator;
 	this.synthetizer = synth;
@@ -64,17 +72,17 @@ Note.prototype.stop = function(){
 var createKeyboard = function (options, keyListener){
 	var synthetizer = new Synthetizer({});
 	var notes= {
-		"G4":{ freq:392,  		key:"a"},
-		"G4#":{ freq:415.30, 	key:"é"},
-		"A4":{ freq:440,  		key:"z"},
-		"A4#":{ freq:466.16, 	key:"\""},
-		"B4":{ freq:493.88,  	key:"e"},
-		"C5":{ freq:523.25,  	key:"r"},
-		"C5#":{ freq:554.37, 	key:"("},
-		"D5":{ freq:587.33,  	key:"t"},
-		"D5#":{ freq:622.25, 	key:"§"},
-		"E5":{ freq:659.25,  	key:"y"},
-		"F5":{ freq:698.46,  	key:"u"}
+		"G4":{ freq:392,  		key:"65"},
+		"G4#":{ freq:415.30, 	key:"50"},
+		"A4":{ freq:440,  		key:"90"},
+		"A4#":{ freq:466.16, 	key:"222"},
+		"B4":{ freq:493.88,  	key:"69"},
+		"C5":{ freq:523.25,  	key:"82"},
+		"C5#":{ freq:554.37, 	key:"53"},
+		"D5":{ freq:587.33,  	key:"84"},
+		"D5#":{ freq:622.25, 	key:"54"},
+		"E5":{ freq:659.25,  	key:"89"},
+		"F5":{ freq:698.46,  	key:"85"}
 	}
 
 	for (var i in notes){
@@ -95,22 +103,27 @@ var createKeyboard = function (options, keyListener){
 
 var KeyListener = function (){
 	this.bindings = {};
-	$(window).on('keydown', this.downHandler);
-	$(window).on('keyup', this.upHandler);
+	$(window).on('keydown', {self: this}, this.downHandler);
+	$(window).on('keyup', {self: this}, this.upHandler);
 }
 KeyListener.prototype.addKeyListener = function(note){
 	this.bindings[note.key] = note;
 }
 KeyListener.prototype.downHandler = function(event){
-	var char = String.fromCharCode(event.which)
-	if (this.bindings[char] != undefined){
-		this.bindings[char].play();
-	}
+	var self = event.data.self;
+	var char = (event.which);
+	console.log('Down character:'+event.which+', '+char);
+
+	if (self.bindings[char] != undefined)
+		self.bindings[char].play();
 }
 KeyListener.prototype.upHandler = function(event){
-	var char = String.fromCharCode(event.which)
-	if (this.bindings[char] != undefined){
-		this.bindings[char].stop();
+	var self = event.data.self;
+	var char = (event.which);
+	console.log('Up character:'+event.which+', '+char);
+
+	if (self.bindings[char] != undefined)
+		self.bindings[char].stop();
 }
 
 var mousedown = false;
@@ -133,5 +146,10 @@ $(document).ready(function() {
 	}).on('mouseleave', '.note', function(event) {
 		synthetizer.notes[$(this).attr('id')].stop();
 	});
+
+	//Configurator
+	$("#config #waveform input").on('change', function(e){
+		synthetizer.setWaveform($(this).attr('value'));
+	})
 });
 })();
