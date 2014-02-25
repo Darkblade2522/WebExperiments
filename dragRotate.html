@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Layout</title>
+    <link href="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.2.2/css/bootstrap-combined.min.css" rel="stylesheet">
+    <meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1, maximum-scale=1">
+    <style>
+
+        #main {
+            position: absolute;
+            left: 100px;
+            top: 100px;
+        }
+
+        .drag {
+            position: absolute;
+            left: 100px;
+            top: 100px;
+            background: #9fe1e7;
+           /* border-radius: 50px;*/
+            width: 100px;
+            height: 100px;
+            text-align: center;
+            /*padding: 50%;*/
+            
+        }
+        .container{
+            position: absolute;
+            left: 0px;
+            top: 0px;
+            background: #FFFFFF;
+            border-radius: 0px;
+            width: 300px;
+            height: 350px;
+            border: solid 2px black;
+            background: url("./grid50.png") repeat;
+        	
+        }
+        .obstacle{
+            position: absolute;
+            background: #FFFFFF;
+            border: solid 2px black;
+            border-radius: 0px;
+        }
+        .obstacle1{/*radiateur*/
+            left: 110px;
+            width: 80px;
+            height: 10px;
+        }
+        .obstacle2{/*fenetre*/
+        	top: -7px;
+            left: 80px;
+            width: 140px;
+            height: 5px;
+        }
+        .obstacle3{/*placard*/
+        	top: 350px;
+            left: 0px;
+            width: 180px;
+            height: 5px;
+        }
+        .obstacle4{/*porte*/
+        	top: 345px;
+            left: 200px;
+            width: 80px;
+            height: 5px;
+        }
+
+        .drag1 {
+        	background: #42d692;
+        	width: 140px;
+        	height: 180px;
+        }
+        .drag2 {
+        	background: #4986e7;
+        	width: 100px;
+        	height:100px
+        }
+        .drag3 {
+        	background: #d06b64;
+        }
+        .drag4 {
+        	background: #cd74e6;
+        }
+        .drag5 {
+        	background: #9fe1e7;
+            top: 150px;
+        }
+
+    </style>
+</head>
+
+<body>
+<div id="main">
+	<div class="container"></div>
+	<div class="obstacle obstacle1"></div>
+	<div class="obstacle obstacle2"></div>
+	<div class="obstacle obstacle3"></div>
+	<div class="obstacle obstacle4"></div>
+	<div class="drag drag1">bureau</div>
+	<div class="drag drag2">lit</div>
+	<div class="drag drag3">etagere</div>
+	<div class="drag drag4">batterie</div>
+	<div class="drag drag5">table de nuit</div>
+</div>
+
+<!-- jQuery is just for the demo! Hammer.js works without jQuery :-) -->
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
+<!--script src="assets/js/modernizr.js"></script-->
+
+<script src="./plugins/hammer.jquery.js"></script>
+<script src="./plugins/hammer.fakemultitouch.js"></script>
+<script src="./plugins/hammer.showtouches.js"></script>
+
+<script>
+
+	Hammer.plugins.fakeMultitouch();
+	Hammer.plugins.showTouches();
+    var hammertime = new Hammer($(".drag"), {drag_max_touches: 0});
+    var lastZIndex = 1;
+    var target;
+    var origin ={
+    	x:0,
+    	y:0
+    }
+
+    $(".drag").on("touch release drag transform", function(ev){
+		/*console.log(ev.type);*/
+    	switch(ev.type){
+    		case "drag":
+	            ev.gesture.preventDefault();
+	
+	            target.css({
+	                "left": origin.x + ev.gesture.deltaX + "px",
+	                "top": origin.y + ev.gesture.deltaY + "px",
+	            });
+    			break;
+    		
+    		case "transform":
+	            ev.gesture.preventDefault();
+	            target.css({
+	                "-webkit-transform": "rotate(" + (origin.a + ev.gesture.rotation) %360 + "deg)"
+	            });
+	            target.attr("data-angle", (origin.a + ev.gesture.rotation) %360);
+    		
+    			break;
+	    	case 'release':
+				ev.gesture.preventDefault();
+	            
+				/*target.data('left', parseInt(target.data('left')) + ev.gesture.deltaX);
+				target.data('top', parseInt(target.data('top')) + ev.gesture.deltaY);
+				target.data('rotation', (parseInt(target.data('rotation')) + ev.gesture.rotation) %360);*/
+	        	//target = undefined;
+	       		break;
+	       case 'touch':
+				ev.gesture.preventDefault();
+				target = $(ev.gesture.touches[0].target);
+				origin.x = parseInt(target.css('left')) || 0;
+				origin.y = parseInt(target.css('top')) || 0;
+				origin.a = parseInt(target.attr("data-angle")) || 0;
+				/*if(isNaN(target.data('left')))
+					target.data('left', parseInt(target.css('left')));
+				if(isNaN(target.data('top')))
+					target.data('top', parseInt(target.css('top')));
+				if(isNaN(target.data('rotation')))
+					target.data('rotation', 0);*/
+				
+	            target.css({
+	                zIndex: lastZIndex++
+	        	});
+	       		break;
+       	}
+   });
+
+
+</script>
+</body>
+</html>
