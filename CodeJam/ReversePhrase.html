@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="fr">
+<head>
+	<meta charset="UTF-8">
+	<title></title>
+	<meta name="viewport" content="initial-scale=1.0">
+	<script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+	<script>
+		$(document).ready(function() {
+			var fileInput = document.getElementById('fileInput');
+			var fileDisplayArea = document.getElementById('fileDisplayArea');
+
+			fileInput.addEventListener('change', function(e) {
+				var file = fileInput.files[0];
+				var textType = /text.*/;
+
+				if (file.type.match(textType)) {
+					var reader = new FileReader();
+
+					reader.onload = function(e) {
+						var result = processFile(reader, event);
+						
+						fileDisplayArea.innerText = result;
+						//Write file
+						window.webkitRequestFileSystem(window.TEMPORARY, 1024*1024, function(fs) {
+						    fs.root.getFile('result.txt', {create: true}, function(fileEntry) {
+			  
+			  			        // Create a FileWriter object for our FileEntry (log.txt).
+			    			        fileEntry.createWriter(function(fileWriter) {
+			    
+			    			            fileWriter.onwriteend = function(e) {
+			    			                console.log('Write completed.');
+			    			            };
+			      
+			      			            fileWriter.onerror = function(e) {
+			      			                console.log('Write failed: ' + e.toString());
+			      			            };
+			      
+			      			            // Create a new Blob and write it to log.txt.
+			      			            var blob = new Blob([result], {type: 'text/plain'});
+			      
+			    			            fileWriter.write(blob);
+			    
+			  			        }, errorHandler);
+			  
+						    }, errorHandler);
+						}, null);
+					}
+
+					reader.readAsText(file);
+				} else {
+					fileDisplayArea.innerText = "File not supported!"
+				}
+			});
+
+			function errorHandler(e) {
+			  var msg = '';
+
+			  switch (e.code) {
+			    case FileError.QUOTA_EXCEEDED_ERR:
+			      msg = 'QUOTA_EXCEEDED_ERR';
+			      break;
+			    case FileError.NOT_FOUND_ERR:
+			      msg = 'NOT_FOUND_ERR';
+			      break;
+			    case FileError.SECURITY_ERR:
+			      msg = 'SECURITY_ERR';
+			      break;
+			    case FileError.INVALID_MODIFICATION_ERR:
+			      msg = 'INVALID_MODIFICATION_ERR';
+			      break;
+			    case FileError.INVALID_STATE_ERR:
+			      msg = 'INVALID_STATE_ERR';
+			      break;
+			    default:
+			      msg = 'Unknown Error';
+			      break;
+			  };
+
+			  console.log('Error: ' + msg);
+			}
+
+			/**
+			 * File parsing and processing
+			 */
+			function processFile(reader, event){
+				var input = reader.result.split("\n");
+				var numberOfTests = parseInt(input[0]);
+				var result = "";
+
+				for (var i = 1; i<= numberOfTests; i++)
+				{
+					result += "Case #"+i+": " + reverseString(input[i]) + "\n";
+				}
+				return result;
+			}
+
+			/**
+			 * Helper functions
+			 */
+
+			function reverseString(s){
+				return s.split(' ').reverse().join(' ');
+			}
+
+
+		});
+	</script>
+	<style>
+		html {
+			font-family: Helvetica, Arial, sans-serif;
+			font-size: 100%;
+			background: #333;
+		}
+
+		#page-wrapper {
+			width: 600px;
+			background: #FFF;
+			padding: 1em;
+			margin: 1em auto;
+			min-height: 300px;
+			border-top: 5px solid #69c773;
+			box-shadow: 0 2px 10px rgba(0,0,0,0.8);
+		}
+
+		h1 {
+			margin-top: 0;
+		}
+
+		img {
+			max-width: 100%;
+		}
+
+		#fileDisplayArea {
+			margin-top: 2em;
+			width: 100%;
+			overflow-x: auto;
+		}
+	</style>
+</head>
+<body>
+	<div id="page-wrapper">
+
+		<h1>Text File Reader</h1>
+		<div>
+			Select a text file: 
+			<input type="file" id="fileInput">
+		</div>
+		<pre id="fileDisplayArea"><pre>
+
+	</div>
+</body>
+</html>
